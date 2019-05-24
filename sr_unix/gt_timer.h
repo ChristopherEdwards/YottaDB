@@ -38,7 +38,7 @@ typedef struct timespec ABS_TIME;
 #include <sys/time.h>
 
 /* Type that corresponds to the tv_usec field in a timeval struct.  Valid across all platforms */
-#if defined(__linux__) || defined(__MVS__) || defined(__CYGWIN__)
+#if defined(__linux__) || defined(__MVS__) || defined(__CYGWIN__) || defined(__APPLE__)
     typedef     suseconds_t     gtm_tv_usec_t;
 #else
 #   error unsupported platform

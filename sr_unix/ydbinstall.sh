@@ -328,6 +328,7 @@ case $gtm_hostos in
     gnu/linux) gtm_hostos="linux" ;;
     hp-ux) gtm_hostos="hpux" ;;
     sun*) gtm_hostos="solaris" ;;
+    Darwin) gtm_hotos="darwin" ;;
 esac
 gtm_shlib_support="Y"
 case ${gtm_hostos}_${gtm_arch} in
@@ -342,7 +343,9 @@ case ${gtm_hostos}_${gtm_arch} in
         ydb_flavor="armv7l" ;;
     linux_aarch64)
         ydb_flavor="aarch64" ;;
-    *) echo Architecture `uname -o` on `uname -m` not supported by this script ; err_exit ;;
+    darwin_x8664)
+        ydb_flavor="x8664" ;;
+    *) echo Architecture `uname -s` on `uname -m` not supported by this script ; err_exit ;;
 esac
 
 if [ "N" = "$ydb_force_install" ]; then

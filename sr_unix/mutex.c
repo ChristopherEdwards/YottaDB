@@ -27,7 +27,7 @@
 #include "gtm_un.h"
 
 #include <errno.h>
-#if defined(__MVS__) || defined(__linux__) || defined(__CYGWIN__)
+#if defined(__MVS__) || defined(__linux__) || defined(__CYGWIN__) || defined(__APPLE__)
 #include "gtm_limits.h"
 #else
 #include <sys/limits.h>
@@ -875,7 +875,7 @@ enum cdb_sc gtm_mutex_lock(gd_region *reg,
 						sleep_spin_cnt = MAX(E_4 - mutex_spin_parms->mutex_hard_spin_count, sleep_spin_cnt);
 						yields += sleep_spin_cnt;	/* start with max */
 					}
-#					ifndef MUTEX_MSEM_WAKE
+#					if 0
 					if (wake_this_pid != process_id)
 						mutex_wake_proc((sm_int_ptr_t)&wake_this_pid, wake_instance);
 #					endif

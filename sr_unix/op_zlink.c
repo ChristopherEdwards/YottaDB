@@ -56,6 +56,25 @@ typedef enum
 #define PROBE_SHLIBS	SKIP_SHLIBS
 #endif
 
+
+// /* On certain platforms the st_mtime field of the stat structure got replaced by a timespec st_mtim field, which in turn has tv_sec
+//  * and tv_nsec fields. For compatibility reasons, those platforms define an st_mtime macro which points to st_mtim.tv_sec. Whenever
+//  * we detect such a situation, we define a nanosecond flavor of that macro to point to st_mtim.tv_nsec. On HPUX Itanium and older
+//  * AIX boxes the stat structure simply has additional fields with the nanoseconds value, yet the names of those field are different
+//  * on those two architectures, so we choose our mapping accordingly.
+//  */
+// #if defined st_mtime
+// # ifdef __APPLE__
+// #   define st_nmtime		st_mtimespec.tv_nsec
+// # else
+// #   define st_nmtime		st_mtim.tv_nsec
+// # endif 
+// #elif defined(_AIX)
+// #  define st_nmtime		st_mtime_n
+// #elif defined(__hpux) && defined(__ia64)
+// #  define st_nmtime		st_nmtime
+// #endif
+
 /* Macro to close object file and give appropriate error */
 #define CLOSE_OBJECT_FD(FD, STATUS)												\
 {																\

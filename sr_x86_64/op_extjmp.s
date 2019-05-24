@@ -17,6 +17,7 @@
 	.include "linkage.si"
 	.include "gtm_threadgbl_deftypes_asm.si"
 #	include "debug.si"
+#	include "ydbmerrors.h"
 
 #
 # op_extjmp transfers control to an external GT.M MUMPS routine with no arguments
@@ -51,6 +52,7 @@
 # macro so we need not save it separately.
 #
 	.data
+	.extern	ERR_GTMCHECK
 	.extern	frame_pointer
 	.extern gtm_threadgbl
 
@@ -179,7 +181,7 @@ gtmcheck:
 	jmp	retlab
 
 #
-# Make call so we can raise the appropriate LABELMISSING error for the not-found label.
+# Make call so we can raise the appropriate LABELMISSING error _for the not-found label.
 #
 label_missing:
 	movq	stack_arg1(%rsp), %rdi				# Index to linkage table and to linkage name table
@@ -187,4 +189,6 @@ label_missing:
 	jmp	retlab
 # Below line is needed to avoid the ELF executable from ending up with an executable stack marking.
 # This marking is not an issue in Linux but is in Windows Subsystem on Linux (WSL) which does not enable executable stack.
+#ifndef __APPLE__
 .section        .note.GNU-stack,"",@progbits
+#endif

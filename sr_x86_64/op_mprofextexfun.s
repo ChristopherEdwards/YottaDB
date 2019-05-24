@@ -17,6 +17,7 @@
 	.include "g_msf.si"
 	.include "gtm_threadgbl_deftypes_asm.si"
 #	include "debug.si"
+#	include "ydbmerrors.h"
 
 #
 # op_mprofextexfun calls an external GT.M MUMPS routine with arguments and provides for
@@ -50,13 +51,15 @@
 #
 # Note we use %r12 as a flag that we don't do more than one of auto_zlink() OR auto_relink_check()
 # call. This keeps us out of any possible loop condition as only one or the other should
-# ever be necessary. Register %r12 is also known as REG_LITERAL_BASE and is saved by the putframe
+# ever be necessary. Register %r12 is also known as %r12 and is saved by the putframe
 # macro so we need not save it separately.
 #
 # Note op_mprofextexfun is a near exact copy of op_extexfun differing only in the name and
 # the version of new_stack_frame() it calls (calls new_stack_frame_sp() instead).
 #
 	.data
+	.extern	ERR_FMLLSTMISSING
+	.extern	ERR_GTMCHECK
 	.extern	dollar_truth
 	.extern	frame_pointer
 	.extern gtm_threadgbl
@@ -272,4 +275,6 @@ fmllstmissing:
 #
 # Below line is needed to avoid the ELF executable from ending up with an executable stack marking.
 # This marking is not an issue in Linux but is in Windows Subsystem on Linux (WSL) which does not enable executable stack.
+#ifndef __APPLE__
 .section        .note.GNU-stack,"",@progbits
+#endif

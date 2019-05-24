@@ -94,6 +94,9 @@
 #  REG32_OUT_ARG3	=	%ecx
 #  REG32_OUT_ARG4	=	%r8d
 #  REG32_OUT_ARG5	=	%r9d
+# from darwin port changes
+#.extern	underr
+#.extern	underr_strict
 
 msf_rvector_off		=	0
 msf_l_symtab_off	=	8
@@ -170,7 +173,7 @@ ARG_COUNT_OFFSET	   =   ARG_SAVE_OFFSET - (8 * NO_REG_SAVED)
 	movq	%r11, msf_mpc_off(%rbp)
 .endm
 
-.extern	error_return
+.extern	_error_return
 
 .macro getframe
 	movq	frame_pointer(%rip), %rbp

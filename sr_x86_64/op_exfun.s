@@ -16,6 +16,7 @@
 	.include "g_msf.si"
 	.include "linkage.si"
 #	include "debug.si"
+#	include "ydbmerrors.h"
 
 #
 # Routine to set up the stack frame for a local (same routine) invocation. It can
@@ -40,6 +41,7 @@
 #
 
 	.data
+	.extern	ERR_GTMCHECK
 	.extern	dollar_truth
 	.extern	frame_pointer
 
@@ -144,4 +146,6 @@ error:
 	jmp	done					# Shouldn't return but in case..
 # Below line is needed to avoid the ELF executable from ending up with an executable stack marking.
 # This marking is not an issue in Linux but is in Windows Subsystem on Linux (WSL) which does not enable executable stack.
+#ifndef __APPLE__
 .section        .note.GNU-stack,"",@progbits
+#endif

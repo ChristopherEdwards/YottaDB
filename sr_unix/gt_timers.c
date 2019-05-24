@@ -786,7 +786,7 @@ void timer_handler(int why, siginfo_t *info, void *context)
 		cmp = abs_time_comp(&at, (ABS_TIME *)&tpop->expir_time);
 		if (cmp < 0)
 			break;
-#		if defined(DEBUG) && !defined(_AIX) && !defined(__armv6l__) && !defined(__armv7l__) && !defined(__aarch64__)
+#		if defined(DEBUG) && !defined(_AIX) && !defined(__armv6l__) && !defined(__armv7l__) && !defined(__aarch64__) && !defined(__APPLE__)
 		if (tpop->safe && (TREF(continue_proc_cnt) == last_continue_proc_cnt)
 			&& !(ydb_white_box_test_case_enabled
 				&& ((WBTEST_SIGTSTP_IN_JNL_OUTPUT_SP == ydb_white_box_test_case_number)

@@ -34,6 +34,10 @@ GBLREF	boolean_t		gtm_jvm_process;
 #endif
 GBLREF	struct sigaction	orig_sig_action[];
 
+#ifndef SIGCLD
+#define SIGCLD SIGCHLD
+#endif
+
 void	null_handler(int sig);
 
 void sig_init(void (*signal_handler)(), void (*ctrlc_handler)(), void (*suspsig_handler)(), void (*continue_handler)())
