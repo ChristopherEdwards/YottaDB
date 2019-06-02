@@ -82,7 +82,13 @@ void dbcertify_signal_handler(int sig, siginfo_t *info, void *context)
 	boolean_t		dbc_critical, exit_now;
 	void			(*signal_routine)();
 
+	#ifndef __APPLE__
+	/* This is for the SimpleThreadAPI which currently supports Linux only as it uses
+	 * Linux specific signals to determine certain statuses
+	 */
 	FORWARD_SIG_TO_MAIN_THREAD_IF_NEEDED(sig_hndlr_dbcertify_signal_handler, sig, IS_EXI_SIGNAL_FALSE, info, context);
+	#endif
+
 	/* Save parameter value in global variables for easy access in core */
 	dont_want_core = FALSE;		/* (re)set in case we recurse */
 	created_core = FALSE;		/* we can deal with a second core if needbe */

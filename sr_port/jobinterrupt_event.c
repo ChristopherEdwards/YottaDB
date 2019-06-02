@@ -49,7 +49,12 @@ GBLREF	struct sigaction	orig_sig_action[];
  */
 void jobinterrupt_event(int sig, siginfo_t *info, void *context)
 {
+	#ifndef __APPLE__
+	/* This is for the SimpleThreadAPI which currently supports Linux only as it uses
+	 * Linux specific signals to determine certain statuses
+	 */
 	FORWARD_SIG_TO_MAIN_THREAD_IF_NEEDED(sig_hndlr_jobinterrupt_event, sig, IS_EXI_SIGNAL_FALSE, info, context);
+	#endif
 	/* Note the (presently unused) args are to match signature for signal handlers in Unix */
 	if (!dollar_zininterrupt)
 		(void)xfer_set_handlers(outofband_event, &jobinterrupt_set, 0, FALSE);

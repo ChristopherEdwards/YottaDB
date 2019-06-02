@@ -798,18 +798,20 @@ install(FILES ${scripts}
 
 find_program(PKGCONFIG NAMES pkg-config)
 if(PKGCONFIG)
-  execute_process(
-    COMMAND ${PKGCONFIG} --modversion icu-io
-    OUTPUT_VARIABLE icu_version
-    RESULT_VARIABLE icu_failed
-    OUTPUT_STRIP_TRAILING_WHITESPACE
-    )
-  if(icu_failed)
-    message(FATAL_ERROR "Command\n ${PKGCONFIG} --modversion icu-io\nfailed (${icu_failed}).")
-  elseif("x${icu_version}" MATCHES "^x([0-9]+\\.[0-9]+)")
-    set(ydb_icu_version "${CMAKE_MATCH_1}")
-  else()
-    message(FATAL_ERROR "Command\n ${PKGCONFIG} --modversion icu-io\nproduced unrecognized output:\n ${icu_version}")
+  if(NOT "${CMAKE_SYSTEM_NAME}" MATCHES "Darwin")
+    execute_process(
+      COMMAND ${PKGCONFIG} --modversion icu-io
+      OUTPUT_VARIABLE icu_version
+      RESULT_VARIABLE icu_failed
+      OUTPUT_STRIP_TRAILING_WHITESPACE
+      )
+    if(icu_failed)
+      message(FATAL_ERROR "Command\n ${PKGCONFIG} --modversion icu-io\nfailed (${icu_failed}).")
+    elseif("x${icu_version}" MATCHES "^x([0-9]+\\.[0-9]+)")
+      set(ydb_icu_version "${CMAKE_MATCH_1}")
+    else()
+      message(FATAL_ERROR "Command\n ${PKGCONFIG} --modversion icu-io\nproduced unrecognized output:\n ${icu_version}")
+    endif()
   endif()
 else()
   message(FATAL_ERROR "Unable to find 'pkg-config'.  Set PKGCONFIG in CMake cache.")
@@ -1008,7 +1010,7 @@ endforeach()
 
 #-----------------------------------------------------------------------------
 # Strip debug symbols from files
-if("${CMAKE_BUILD_TYPE}" MATCHES "RelWithDebInfo")
+if("${CMAKE_BUILD_TYPE}" MATCHES "RelWithDebInfo" AND NOT "${CMAKE_SYSTEM_NAME}" MATCHES "Darwin")
   list(APPEND executable_target_list
     dbcertify
     dse

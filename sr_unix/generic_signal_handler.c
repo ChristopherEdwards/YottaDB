@@ -127,6 +127,11 @@ void generic_signal_handler(int sig, siginfo_t *info, void *context)
 		DRIVE_NON_YDB_SIGNAL_HANDLER_IF_ANY("generic_signal_handler", sig, info, context, TRUE);
 		UNDERSCORE_EXIT(sig);
 	}
+	
+	#ifndef __APPLE__
+	/* This is for the SimpleThreadAPI which currently supports Linux only as it uses
+	 * Linux specific signals to determine certain statuses
+	 */
 	signal_forwarded = IS_SIGNAL_FORWARDED(sig_hndlr_generic_signal_handler, sig, info);
 	/* Note down whether signal is forwarded or not */
 	if (!signal_forwarded)
@@ -161,6 +166,11 @@ void generic_signal_handler(int sig, siginfo_t *info, void *context)
 	 */
 	save_in_nondeferrable_signal_handler = in_nondeferrable_signal_handler;
 #	endif
+	#else
+	/* We can never have a forwarded signal as it is ifdefed out, hardcode to FALSE
+	 */
+	signal_forwarded = FALSE;
+	#endif
 	/* Save parameter value in global variables for easy access in core */
 	dont_want_core = FALSE;		/* (re)set in case we recurse */
 	created_core = FALSE;		/* we can deal with a second core if needbe */

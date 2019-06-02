@@ -21,6 +21,7 @@
 
 #ifdef __APPLE__
 #include "timing_mach.h"
+#include <errno.h>
 #endif
 
 /* Note: GT.M code *MUST NOT* use the sleep function because it causes problems with GT.M's timers on some platforms. Specifically,

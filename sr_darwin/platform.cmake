@@ -34,7 +34,7 @@ list(APPEND CMAKE_ASM_COMPILE_OBJECT "objconv -nu+ -v0 <OBJECT> <OBJECT>.rename"
 list(APPEND CMAKE_ASM_COMPILE_OBJECT "mv <OBJECT>.rename <OBJECT>")
 
 # Compiler
-set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -std=c99 -fPIC ")
+set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -std=c99 -fPIC")
 set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -fsigned-char -Wmissing-prototypes -Wreturn-type -Wpointer-sign")
 # Add flags for warnings that we want and don't want.
 # First enable Wall. That will include a lot of warnings. In them, disable a few. Below is a comment from sr_linux/gtm_env_sp.csh
@@ -48,11 +48,10 @@ set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -fsigned-char -Wmissing-prototypes -Wreturn-
 # Note: -Wimplicit not explicitly mentioned since it is enabled by Wall
 # Note: -Wuninitialized not explicitly mentioned since it is enabled by Wall
 set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wall -Wno-unused-result -Wno-parentheses -Wno-unused-value -Wno-unused-variable")
+set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wno-char-subscripts")
 
-# Darwin port:
-# * -Wno-unused-but-set-variable =>
-
-set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wno-char-subscripts -Wno-sometimes-uninitialized")
+#TODO: Warnings in obj_filesp
+#set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wvla")
 
 # Below is an optimization flag related description copied from sr_linux/gtm_env_sp.csh
 #	-fno-defer-pop to prevent problems with assembly/generated code with optimization
@@ -61,23 +60,19 @@ set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wno-char-subscripts -Wno-sometimes-uninitia
 #	-fno-omit-frame-pointer so %rbp always gets set up (required by caller_id()). Default changed in gcc 4.6.
 # All these are needed only in case of pro builds (if compiler optimization if turned on).
 # But they are no-ops in case of a dbg build when optimization is turned off so we include them in all cmake builds.
-
-# Darwin port:
-# Unsupported optimization flags:
-# * -fno-defer-pop
-# * -ffloat-store
-#
 set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -fno-strict-aliasing -fno-omit-frame-pointer")
 
-if ("${CMAKE_BUILD_TYPE}" STREQUAL "Release")
-	# This causes the build to slightly bloat in size. Avoid that for
-	# production builds of YottaDB.
-	set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -fno-stack-protector")
-else()
-	# In Debug builds though, keep stack-protection on for ALL functions.
+if ("${CMAKE_BUILD_TYPE}" STREQUAL "Debug")
+	# Newer versions of Linux by default include -fstack-protector in gcc. This causes the build to slightly bloat
+	# in size and have a runtime overhead (as high as 5% extra CPU cost in our experiments). So keep that option
+	# enabled only for DEBUG builds of YottaDB.
 	set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -fstack-protector-all")
+else()
+	# For "Release" or "RelWithDebInfo" type of builds, keep this option disabled for performance reasons
+  set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -fno-stack-protector")
 endif()
 
+# On ARM Linux, gcc by default does not include -funwind-tables whereas it does on x86_64 Linux.
 # This is needed to get backtrace() (used by caller_id.c etc.) working correctly.
 set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -funwind-tables")
 
@@ -99,7 +94,7 @@ include_directories(${ZLIB_INCLUDE_DIRS})
 # default homebrew location for openssl includes
 include_directories("/usr/local/opt/openssl/include")
 
-find_path(LIBICU_INCLUDE_PATH NAMES uchar.h unicode/uchar.h)
+find_path(LIBICU_INCLUDE_PATH NAMES uchar.h unicode/uchar.h HINTS /usr/local/opt/icu4c/include)
 include_directories(${LIBICU_INCLUDE_PATH})
 
 set(GTM_SET_ICU_VERSION 0 CACHE BOOL "Unless you want ICU from MacPorts/other avoid setting gtm_icu_version to get Apple's undocumented ICU library")
@@ -116,35 +111,69 @@ set(gtm_dep   "${YDB_BINARY_DIR}/ydbexe_symbols.export")
 
 set(libyottadb_link "-Wl,-U,ydb_ci -Wl,-U,gtm_filename_to_id -Wl,-U,gtm_is_main_thread")
 set(libyottadb_link "${libyottadb_link} -Wl,-U,accumulate -Wl,-U,is_big_endian -Wl,-U,to_ulong")
+set(libyottadb_link "${libyottadb_link} -Wl,-U,gtm_ci")
+set(libyottadb_link "${libyottadb_link} -Wl,-U,gtm_cip")
+set(libyottadb_link "${libyottadb_link} -Wl,-U,ydb_call_variadic_plist_func")
 set(libyottadb_link "${libyottadb_link} -Wl,-U,ydb_child_init")
+set(libyottadb_link "${libyottadb_link} -Wl,-U,ydb_ci_t")
+set(libyottadb_link "${libyottadb_link} -Wl,-U,ydb_cip")
+set(libyottadb_link "${libyottadb_link} -Wl,-U,ydb_cip_t")
+set(libyottadb_link "${libyottadb_link} -Wl,-U,ydb_ci_tab_open")
+set(libyottadb_link "${libyottadb_link} -Wl,-U,ydb_ci_tab_open_t")
+set(libyottadb_link "${libyottadb_link} -Wl,-U,ydb_ci_tab_switch")
+set(libyottadb_link "${libyottadb_link} -Wl,-U,ydb_ci_tab_switch_t")
 set(libyottadb_link "${libyottadb_link} -Wl,-U,ydb_data_s")
+set(libyottadb_link "${libyottadb_link} -Wl,-U,ydb_data_st")
 set(libyottadb_link "${libyottadb_link} -Wl,-U,ydb_delete_excl_s")
+set(libyottadb_link "${libyottadb_link} -Wl,-U,ydb_delete_excl_st")
 set(libyottadb_link "${libyottadb_link} -Wl,-U,ydb_delete_s")
+set(libyottadb_link "${libyottadb_link} -Wl,-U,ydb_delete_st")
 set(libyottadb_link "${libyottadb_link} -Wl,-U,ydb_file_id_free")
+set(libyottadb_link "${libyottadb_link} -Wl,-U,ydb_file_id_free_t")
 set(libyottadb_link "${libyottadb_link} -Wl,-U,ydb_file_is_identical")
+set(libyottadb_link "${libyottadb_link} -Wl,-U,ydb_file_is_identical_t")
 set(libyottadb_link "${libyottadb_link} -Wl,-U,ydb_file_name_to_id")
+set(libyottadb_link "${libyottadb_link} -Wl,-U,ydb_file_name_to_id_t")
 set(libyottadb_link "${libyottadb_link} -Wl,-U,ydb_fork_n_core")
 set(libyottadb_link "${libyottadb_link} -Wl,-U,ydb_free")
 set(libyottadb_link "${libyottadb_link} -Wl,-U,ydb_get_s")
+set(libyottadb_link "${libyottadb_link} -Wl,-U,ydb_get_st")
 set(libyottadb_link "${libyottadb_link} -Wl,-U,ydb_hiber_start")
 set(libyottadb_link "${libyottadb_link} -Wl,-U,ydb_hiber_start_wait_any")
 set(libyottadb_link "${libyottadb_link} -Wl,-U,ydb_incr_s")
+set(libyottadb_link "${libyottadb_link} -Wl,-U,ydb_incr_st")
 set(libyottadb_link "${libyottadb_link} -Wl,-U,ydb_lock_decr_s")
+set(libyottadb_link "${libyottadb_link} -Wl,-U,ydb_lock_decr_st")
 set(libyottadb_link "${libyottadb_link} -Wl,-U,ydb_lock_incr_s")
+set(libyottadb_link "${libyottadb_link} -Wl,-U,ydb_lock_incr_st")
 set(libyottadb_link "${libyottadb_link} -Wl,-U,ydb_lock_s")
+set(libyottadb_link "${libyottadb_link} -Wl,-U,ydb_lock_st")
 set(libyottadb_link "${libyottadb_link} -Wl,-U,ydb_malloc")
+set(libyottadb_link "${libyottadb_link} -Wl,-U,ydb_message")
+set(libyottadb_link "${libyottadb_link} -Wl,-U,ydb_message_t")
 set(libyottadb_link "${libyottadb_link} -Wl,-U,ydb_node_next_s")
+set(libyottadb_link "${libyottadb_link} -Wl,-U,ydb_node_next_st")
 set(libyottadb_link "${libyottadb_link} -Wl,-U,ydb_node_previous_s")
+set(libyottadb_link "${libyottadb_link} -Wl,-U,ydb_node_previous_st")
 set(libyottadb_link "${libyottadb_link} -Wl,-U,ydb_set_s")
+set(libyottadb_link "${libyottadb_link} -Wl,-U,ydb_set_st")
 set(libyottadb_link "${libyottadb_link} -Wl,-U,ydb_stdout_stderr_adjust")
+set(libyottadb_link "${libyottadb_link} -Wl,-U,ydb_stdout_stderr_adjust_t")
 set(libyottadb_link "${libyottadb_link} -Wl,-U,ydb_str2zwr_s")
+set(libyottadb_link "${libyottadb_link} -Wl,-U,ydb_str2zwr_st")
 set(libyottadb_link "${libyottadb_link} -Wl,-U,ydb_subscript_next_s")
+set(libyottadb_link "${libyottadb_link} -Wl,-U,ydb_subscript_next_st")
 set(libyottadb_link "${libyottadb_link} -Wl,-U,ydb_subscript_previous_s")
+set(libyottadb_link "${libyottadb_link} -Wl,-U,ydb_subscript_previous_st")
 set(libyottadb_link "${libyottadb_link} -Wl,-U,ydb_thread_is_main")
 set(libyottadb_link "${libyottadb_link} -Wl,-U,ydb_timer_cancel")
+set(libyottadb_link "${libyottadb_link} -Wl,-U,ydb_timer_cancel_t")
 set(libyottadb_link "${libyottadb_link} -Wl,-U,ydb_timer_start")
+set(libyottadb_link "${libyottadb_link} -Wl,-U,ydb_timer_start_t")
 set(libyottadb_link "${libyottadb_link} -Wl,-U,ydb_tp_s")
+set(libyottadb_link "${libyottadb_link} -Wl,-U,ydb_tp_st")
 set(libyottadb_link "${libyottadb_link} -Wl,-U,ydb_zwr2str_s")
+set(libyottadb_link "${libyottadb_link} -Wl,-U,ydb_zwr2str_st")
 set(libyottadb_link "${libyottadb_link} -Wl,-exported_symbols_list,\"${YDB_BINARY_DIR}/yottadb_symbols.export\"")
 set(libyottadb_dep  "${YDB_BINARY_DIR}/ydbexe_symbols.export")
 

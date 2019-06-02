@@ -91,9 +91,9 @@ LITDEF mach_inst jsb_action[JSB_ACTION_N_INS] = {0x48, 0xc7, 0xc0, 0xff, 0xff, 0
 
 
 GBLREF command_qualifier cmd_qlf;
-GBLREF char		object_file_name[];
+GBLREF unsigned char	object_file_name[];
 GBLREF int		object_file_des;
-GBLREF short		object_name_len;
+GBLREF unsigned short	object_name_len;
 GBLREF mident		module_name;
 GBLREF boolean_t	run_time;
 GBLREF int4		gtm_object_size;

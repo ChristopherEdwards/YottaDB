@@ -36,7 +36,12 @@ void ctrlc_handler(int sig, siginfo_t *info, void *context)
 	int4    ob_char;
 	int	save_errno;
 
+	#ifndef __APPLE__
+	/* This is for the SimpleThreadAPI which currently supports Linux only as it uses
+	 * Linux specific signals to determine certain statuses
+	 */
 	FORWARD_SIG_TO_MAIN_THREAD_IF_NEEDED(sig_hndlr_ctrlc_handler, sig, IS_EXI_SIGNAL_FALSE, info, context);
+	#endif
 	assert(SIGINT == sig);
 	if (!(MUMPS_CALLIN & invocation_mode))
 	{	/* Normal procedure from MUMPS is to set our outofband trigger to handle this signal */

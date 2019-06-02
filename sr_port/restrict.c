@@ -98,12 +98,14 @@ error_def(ERR_TEXT);
 			rts_error_csa(CSA_ARG(NULL) VARLSTCNT(8) ERR_SYSCALL, 5,					\
 				LEN_AND_LIT("PUT_FLNAME_IN_MAPPING_FILE() stat() for " RESTRICT_FILENAME), CALLFROM,	\
 				errno);											\
-		rmtime = rTime.st_mtim;											\
+		/* in APPLE the st_mtim is renamed as st_mtimespec in the status struct	*/				\
+		rmtime = rTime.st_mtimespec;										\
 		if (-1 == Stat(FPATH, &fTime))										\
 			rts_error_csa(CSA_ARG(NULL) VARLSTCNT(8) ERR_SYSCALL, 5,					\
 				LEN_AND_LIT("PUT_FLNAME_IN_MAPPING_FILE() stat() for " COMM_FILTER_FILENAME), CALLFROM,	\
 				errno);											\
-		fmtime = fTime.st_mtim;											\
+		/* in APPLE the st_mtim is renamed as st_mtimespec in the status struct	*/				\
+		fmtime = fTime.st_mtimespec;										\
 		/* Check if restrict.txt file modification time (rmtime) is newer than					\
 		 * filter_commands.tab file modification time (fmtime). If so, recreate filter_commands.tab.		\
 		 */													\

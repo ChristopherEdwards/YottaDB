@@ -45,8 +45,13 @@ chnd_jmp	=	24
 	addq	$chnd_jmp, %rax			# setjmp(ctxt->jmp)
 	movq	$0, %rsi
 	movq	%rax, %rdi
-	call 	__sigsetjmp@PLT
-	cmp	$0,%eax				# Which return is this?
+	# .ifdef __APPLE__
+	call	sigsetjmp
+	incl	%eax
+	# .else
+	# call 	__sigsetjmp@PLT
+	# cmp	$0,%eax				# Which return is this?
+	# .endif
 	je	\labelend
 	# This is the return when an error was unwound. Need to reduce rts_error_depth before doing anything else
 	movq	gtm_threadgbl(%rip), %r11	# %r10 contains threadgbl base

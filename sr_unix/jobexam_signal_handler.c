@@ -54,7 +54,12 @@ void jobexam_signal_handler(int sig, siginfo_t *info, void *context)
 {
 	gtmsiginfo_t	signal_info;
 
+	#ifndef __APPLE__
+	/* This is for the SimpleThreadAPI which currently supports Linux only as it uses
+	 * Linux specific signals to determine certain statuses
+	 */
 	FORWARD_SIG_TO_MAIN_THREAD_IF_NEEDED(sig_hndlr_jobexam_signal_handler, sig, IS_EXI_SIGNAL_FALSE, info, context);
+	#endif
 	extract_signal_info(sig, info, context, &signal_info);
 	switch(signal_info.infotype)
 	{

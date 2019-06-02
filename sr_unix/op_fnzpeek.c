@@ -167,7 +167,12 @@ CONDITION_HANDLER(op_fnzpeek_ch)
  */
 void op_fnzpeek_signal_handler(int sig, siginfo_t *info, void *context)
 {
+	#ifndef __APPLE__
+	/* This is for the SimpleThreadAPI which currently supports Linux only as it uses
+	 * Linux specific signals to determine certain statuses
+	 */
 	FORWARD_SIG_TO_MAIN_THREAD_IF_NEEDED(sig_hndlr_op_fnzpeek_signal_handler, sig, IS_EXI_SIGNAL_FALSE, info, context);
+	#endif
 	/* We basically want to do UNWIND(NULL, NULL) logic but the UNWIND macro can only be used in a condition
 	 * handler so next is a block that pretends it is our condition handler and does the needful. Note in order
 	 * for this to work, we need to be wrapped in a condition handler even if that condition handler is never

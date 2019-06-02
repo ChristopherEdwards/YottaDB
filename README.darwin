@@ -17,6 +17,12 @@ sudo chmod ugo+rw /usr/local/lib
 
 Now go ahead and make:
 ```
-   mkdir build && cd build && cmake -D CMAKE_INSTALL_PREFIX:PATH=$PWD ../
-   make -j16
+mkdir build && cd build && cmake -D CMAKE_INSTALL_PREFIX:PATH=$PWD ../
+make -j16
+```
+
+To re-install the system header files in the expected location on OS X Mojave:
+
+```
+sudo installer -pkg /Library/Developer/CommandLineTools/Packages/macOS_SDK_headers_for_macOS_10.14.pkg -target /
 ```

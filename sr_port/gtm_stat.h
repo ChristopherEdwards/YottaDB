@@ -32,11 +32,20 @@
 #define LSTAT   lstat
 
 /* Returns TRUE if STAT1 modification time is older than STAT2 modification time */
+#ifdef __APPLE__
+#define	IS_STAT1_MTIME_OLDER_THAN_STAT2(STAT1, STAT2) ((STAT1.st_mtimespec.tv_sec < STAT2.st_mtimespec.tv_sec)			\
+							|| ((STAT1.st_mtimespec.tv_sec == STAT2.st_mtimespec.tv_sec)		\
+								&& (STAT1.st_mtimespec.tv_nsec < STAT2.st_mtimespec.tv_nsec)))
+
+#define	IS_STAT1_MTIME_EQUAL_TO_STAT2(STAT1, STAT2) ((STAT1.st_mtimespec.tv_sec == STAT2.st_mtimespec.tv_sec)			\
+								&& (STAT1.st_mtimespec.tv_nsec == STAT2.st_mtimespec.tv_nsec))
+#else
 #define	IS_STAT1_MTIME_OLDER_THAN_STAT2(STAT1, STAT2) ((STAT1.st_mtim.tv_sec < STAT2.st_mtim.tv_sec)			\
 							|| ((STAT1.st_mtim.tv_sec == STAT2.st_mtim.tv_sec)		\
 								&& (STAT1.st_mtim.tv_nsec < STAT2.st_mtim.tv_nsec)))
 
 #define	IS_STAT1_MTIME_EQUAL_TO_STAT2(STAT1, STAT2) ((STAT1.st_mtim.tv_sec == STAT2.st_mtim.tv_sec)			\
 								&& (STAT1.st_mtim.tv_nsec == STAT2.st_mtim.tv_nsec))
+#endif
 
 #endif

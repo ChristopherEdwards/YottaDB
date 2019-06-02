@@ -16,6 +16,7 @@
 /* mlk_ops.h */
 
 #include <sys/shm.h>
+#include <errno.h>
 
 #include "interlock.h"
 #include "do_shmat.h"

@@ -41,7 +41,12 @@ void continue_handler(int sig, siginfo_t *info, void *context)
 	DCL_THREADGBL_ACCESS;
 
 	SETUP_THREADGBL_ACCESS;
+	#ifndef __APPLE__
+	/* This is for the SimpleThreadAPI which currently supports Linux only as it uses
+	 * Linux specific signals to determine certain statuses
+	 */
 	FORWARD_SIG_TO_MAIN_THREAD_IF_NEEDED(sig_hndlr_continue_handler, sig, IS_EXI_SIGNAL_FALSE, info, context);
+	#endif
 	/* Count how many times we get a continue-process signal (in DEBUG) */
 	DEBUG_ONLY(DBGGSSHR((LOGFLAGS, "continue_handler: pid %d, continue_proc_cnt bumped from %d to %d\n",
 			     process_id, TREF(continue_proc_cnt), TREF(continue_proc_cnt) + 1)));

@@ -21,7 +21,7 @@
  *
  *   1. Make organization defensible. Possible organizations:
  *      a. Group like-types alphabetically.
- *      b. Gorup related items (such as compiler, replication, etc.
+ *      b. Group related items (such as compiler, replication, etc.
  *   2. Because references will use an offset into this structure and since the "immediate offset" in
  *      compiler generated instructions is usually limited to "smaller" values like less than 16K or
  *      32K or whatever (platform dependent), items near the top of the table should be reserved used for
