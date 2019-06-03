@@ -31,7 +31,11 @@
 	movq	%rax, 0(%rsp)		# Save %rax - potential arg reg used in some asm rtns
 	movq	%rsp, %rax		# Copy stack pointer
 	andl	$15, %eax		# Check for 16 byte alignment
-	jz	stkok\@			# Branch around if stack ok
+	# .ifdef __APPLE__
+	jz	stkok
+	# .else
+	# jz	stkok\@			# Branch around if stack ok
+	# .endif
 	#
 	# Stack is not aligned - raise error
 	#
@@ -39,7 +43,11 @@
 	movl	$1, %edi
 	movb    $0, %al			# Variable length argument
 	call	rts_error
-stkok\@:
+# .ifdef __APPLE__
+stkok:
+# .else
+# stkok\@:
+# .endif
 	movq	0(%rsp), %rax		# Restore %rax
 	addq	$16, %rsp		# Remove save area
 	.endif
