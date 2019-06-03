@@ -231,7 +231,3 @@ mrt_tmp_sz		=	200
 mrt_curr_ptr		=	208
 mrt_oldr_ptr		=	216
 mrt_zhist		=	264
-
-
-
-ggo_lnk_proxy = 3112
